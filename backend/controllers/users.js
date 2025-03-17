@@ -1,4 +1,6 @@
 const User = require('../models/User')
+const Poll = require('../models/Poll')
+const Query = require('../models/Query')
 const getUser = async(req,res)=>{
     try {
         const user = await User.findById(req.params.id);
@@ -15,6 +17,7 @@ const getUsers = async(req,res)=>{
         console.error(error);
     }
 }
+
 const deleteUser = async(req,res)=>{
     try {
         await User.findByIdAndDelete(req.params.id);
