@@ -88,7 +88,7 @@ const voteQuery = async (req, res) => {
        
         query.vote.push(userId);
         
-        // Save the updated query
+      
         const updatedQuery = await query.save();
         
         res.status(200).json({
@@ -115,4 +115,4 @@ const getQueries = async(req,res)=>{
         console.error(error);
     }
 }
-module.exports = {createQuery,updateQuery,deleteQuery,getQueries}
+module.exports = {createQuery,updateQuery,deleteQuery,getQueries,voteQuery}

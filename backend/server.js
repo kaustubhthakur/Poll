@@ -7,6 +7,7 @@ require('dotenv').config();
 const authrouter = require('./routes/auth')
 const userrouter = require('./routes/users')
 const pollrouter = require('./routes/polls')
+const queryrouter = require('./routes/queries')
 const cors = require('cors')
 
 app.use(cookieParser())
@@ -25,6 +26,7 @@ connection();
 app.use('/auth',authrouter)
 app.use('/users',userrouter)
 app.use('/polls',pollrouter)
+app.use('/query',queryrouter)
 app.listen(port,() =>{
     console.log(`server is running on port ${port}...`)
 })
