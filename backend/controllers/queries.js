@@ -49,10 +49,10 @@ const deleteQuery = async (req, res, next) => {
 const voteQuery = async (req, res) => {
     try {
         const { queryId } = req.params;
-        const userId = req.user.id; // Assuming you have user authentication middleware
+        const userId = req.user.id; 
         const { pollId } = req.body;
 
-        // Check if the query exists
+     
         const query = await Query.findById(queryId);
         if (!query) {
             return res.status(404).json({ 
@@ -61,7 +61,6 @@ const voteQuery = async (req, res) => {
             });
         }
         
-        // Get the poll and verify it exists
         const poll = await Poll.findById(pollId);
         if (!poll) {
             return res.status(404).json({ 
@@ -70,12 +69,11 @@ const voteQuery = async (req, res) => {
             });
         }
         
-        // Find all queries for this poll
         const pollQueries = await Query.find({
             _id: { $in: poll.queries }
         });
         
-        // Check if user has already voted for any query in this poll
+       
         const hasVotedInPoll = pollQueries.some(pq => 
             pq.vote.includes(userId)
         );
@@ -87,7 +85,7 @@ const voteQuery = async (req, res) => {
             });
         }
         
-        // Add user to vote array
+       
         query.vote.push(userId);
         
         // Save the updated query
