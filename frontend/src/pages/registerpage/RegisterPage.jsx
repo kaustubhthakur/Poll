@@ -66,12 +66,12 @@ const RegisterPage = () => {
       setSuccess(true);
       setLoading(false);
       
-      // Store user data in localStorage or context
+     
       localStorage.setItem('user', JSON.stringify(response.data));
       alert('registered....')
-      // Redirect to dashboard after successful registration
+     
       setTimeout(() => {
-        navigate('/');
+        navigate('/loginpage');
       }, 1500);
       
     } catch (error) {
