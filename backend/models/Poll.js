@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const PollSchema = new mongoose({
+const PollSchema = new mongoose.Schema({
     title: {
         type: String,
         required: true,

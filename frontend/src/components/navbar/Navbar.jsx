@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -12,9 +13,9 @@ const Navbar = () => {
     <nav className="navbar">
       <div className="navbar-container">
         <div className="navbar-logo">
-          <a href="/">
+          <Link to="/">
             <img src="/api/placeholder/150/50" alt="Logo" />
-          </a>
+          </Link>
         </div>
 
         <div className="menu-icon" onClick={toggleMenu}>
@@ -25,11 +26,10 @@ const Navbar = () => {
           </div>
         </div>
 
-       
-
+ 
         <div className={`nav-auth ${isOpen ? 'active' : ''}`}>
-          <button className="login-button">Login</button>
-          <button className="register-button">Register</button>
+          <Link to="/loginpage" className="login-button">Login</Link>
+          <Link to="/registerpage" className="register-button">Register</Link>
         </div>
       </div>
     </nav>

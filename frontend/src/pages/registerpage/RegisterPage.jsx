@@ -7,8 +7,7 @@ const RegisterPage = () => {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
-    password: '',
-    confirmPassword: ''
+    password: ''
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -23,9 +22,9 @@ const RegisterPage = () => {
   };
 
   const validateForm = () => {
-    const { username, email, password, confirmPassword } = formData;
+    const { username, email, password } = formData;
     
-    if (!username || !email || !password || !confirmPassword) {
+    if (!username || !email || !password) {
       setError('All fields are required');
       return false;
     }
@@ -40,12 +39,6 @@ const RegisterPage = () => {
     // Password validation
     if (password.length < 6) {
       setError('Password must be at least 6 characters long');
-      return false;
-    }
-    
-    // Password confirmation
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
       return false;
     }
     
@@ -64,7 +57,7 @@ const RegisterPage = () => {
     
     try {
       const { username, email, password } = formData;
-      const response = await axios.post('/api/users/register', {
+      const response = await axios.post('http://localhost:9000/auth/register', {
         username,
         email,
         password
@@ -75,10 +68,10 @@ const RegisterPage = () => {
       
       // Store user data in localStorage or context
       localStorage.setItem('user', JSON.stringify(response.data));
-      
+      alert('registered....')
       // Redirect to dashboard after successful registration
       setTimeout(() => {
-        navigate('/dashboard');
+        navigate('/');
       }, 1500);
       
     } catch (error) {
@@ -140,19 +133,6 @@ const RegisterPage = () => {
             />
           </div>
           
-          <div className="form-group">
-            <label htmlFor="confirmPassword">Confirm Password</label>
-            <input
-              type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              placeholder="Confirm your password"
-              disabled={loading}
-            />
-          </div>
-          
           <button 
             type="submit" 
             className={`register-button ${loading ? 'loading' : ''}`}
@@ -163,7 +143,7 @@ const RegisterPage = () => {
         </form>
         
         <div className="register-footer">
-          Already have an account? <Link to="/login">Login</Link>
+          Already have an account? <Link to="/loginpage">Login</Link>
         </div>
       </div>
     </div>
