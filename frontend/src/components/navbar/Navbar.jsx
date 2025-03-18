@@ -25,20 +25,7 @@ const Navbar = () => {
           </div>
         </div>
 
-        <ul className={`nav-menu ${isOpen ? 'active' : ''}`}>
-          <li className="nav-item">
-            <a href="/" className="nav-link">Home</a>
-          </li>
-          <li className="nav-item">
-            <a href="/about" className="nav-link">About</a>
-          </li>
-          <li className="nav-item">
-            <a href="/services" className="nav-link">Services</a>
-          </li>
-          <li className="nav-item">
-            <a href="/contact" className="nav-link">Contact</a>
-          </li>
-        </ul>
+       
 
         <div className={`nav-auth ${isOpen ? 'active' : ''}`}>
           <button className="login-button">Login</button>
