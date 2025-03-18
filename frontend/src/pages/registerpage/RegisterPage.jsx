@@ -1,0 +1,173 @@
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import axios from 'axios';
+import './RegisterPage.css';
+
+const RegisterPage = () => {
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const validateForm = () => {
+    const { username, email, password, confirmPassword } = formData;
+    
+    if (!username || !email || !password || !confirmPassword) {
+      setError('All fields are required');
+      return false;
+    }
+    
+    // Email validation using regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Invalid email format');
+      return false;
+    }
+
+    // Password validation
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      return false;
+    }
+    
+    // Password confirmation
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return false;
+    }
+    
+    return true;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+    
+    setLoading(true);
+    setError('');
+    
+    try {
+      const { username, email, password } = formData;
+      const response = await axios.post('/api/users/register', {
+        username,
+        email,
+        password
+      });
+      
+      setSuccess(true);
+      setLoading(false);
+      
+      // Store user data in localStorage or context
+      localStorage.setItem('user', JSON.stringify(response.data));
+      
+      // Redirect to dashboard after successful registration
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 1500);
+      
+    } catch (error) {
+      setLoading(false);
+      if (error.response && error.response.data && error.response.data.error) {
+        setError(error.response.data.error);
+      } else {
+        setError('Registration failed. Please try again.');
+      }
+    }
+  };
+
+  return (
+    <div className="register-container">
+      <div className="register-form-container">
+        <h1 className="register-title">Create Your Account</h1>
+        <p className="register-subtitle">Join our community today</p>
+        
+        {error && <div className="error-message">{error}</div>}
+        {success && <div className="success-message">Registration successful! Redirecting...</div>}
+        
+        <form onSubmit={handleSubmit} className="register-form">
+          <div className="form-group">
+            <label htmlFor="username">Username</label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              placeholder="Choose a username"
+              disabled={loading}
+            />
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="Your email address"
+              disabled={loading}
+            />
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="Create a password (min 6 characters)"
+              disabled={loading}
+            />
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="confirmPassword">Confirm Password</label>
+            <input
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              placeholder="Confirm your password"
+              disabled={loading}
+            />
+          </div>
+          
+          <button 
+            type="submit" 
+            className={`register-button ${loading ? 'loading' : ''}`}
+            disabled={loading}
+          >
+            {loading ? 'Registering...' : 'Register'}
+          </button>
+        </form>
+        
+        <div className="register-footer">
+          Already have an account? <Link to="/login">Login</Link>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default RegisterPage;
