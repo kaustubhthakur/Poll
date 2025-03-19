@@ -29,7 +29,6 @@ const RegisterPage = () => {
       return false;
     }
     
-   
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setError('Invalid email format');
@@ -57,7 +56,7 @@ const RegisterPage = () => {
     
     try {
       const { username, email, password } = formData;
-      const response = await axios.post('http://localhost:9000/auth/register', {
+      await axios.post('http://localhost:9000/auth/register', {
         username,
         email,
         password
@@ -66,12 +65,10 @@ const RegisterPage = () => {
       setSuccess(true);
       setLoading(false);
       
-     
-      localStorage.setItem('user', JSON.stringify(response.data));
-      alert('registered....')
+      alert('Registration successful! Please log in.');
      
       setTimeout(() => {
-        navigate('/loginpage');
+        navigate('/'); 
       }, 1500);
       
     } catch (error) {
@@ -91,7 +88,7 @@ const RegisterPage = () => {
         <p className="register-subtitle">Join our community today</p>
         
         {error && <div className="error-message">{error}</div>}
-        {success && <div className="success-message">Registration successful! Redirecting...</div>}
+        {success && <div className="success-message">Registration successful! Redirecting to login...</div>}
         
         <form onSubmit={handleSubmit} className="register-form">
           <div className="form-group">
