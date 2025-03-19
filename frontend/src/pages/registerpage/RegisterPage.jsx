@@ -29,7 +29,7 @@ const RegisterPage = () => {
       return false;
     }
     
-    // Email validation using regex
+   
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setError('Invalid email format');
