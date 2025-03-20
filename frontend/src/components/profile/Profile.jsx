@@ -15,7 +15,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        // Check if a user is logged in
+      
         const loggedInUser = JSON.parse(localStorage.getItem('user'));
         
         if (!loggedInUser) {
@@ -23,13 +23,13 @@ const Profile = () => {
           return;
         }
         
-        // Determine which ID to use
+      
         const userId = id || loggedInUser._id;
         
-        // Check if viewing own profile
+        
         setIsCurrentUser(loggedInUser._id === userId);
         
-        // Fetch user data
+   
         const response = await axios.get(`http://localhost:9000/users/${userId}`);
         setUser(response.data);
         setLoading(false);
