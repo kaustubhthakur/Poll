@@ -1,7 +1,7 @@
 const Poll = require('../models/Poll')
 const Query = require('../models/Query')
 const createQuery = async (req, res) => {
-    const pollId = req.params.pollid;
+    const pollId = req.params.id;
     const newQuery = new Query(req.body);
 
     try {
@@ -48,9 +48,9 @@ const deleteQuery = async (req, res, next) => {
 };
 const voteQuery = async (req, res) => {
     try {
-        const { queryId } = req.params;
+        const { queryId } = req.params.id;
         const userId = req.user.id; 
-        const { pollId } = req.body;
+        const { pollId } = req.params.id;
 
      
         const query = await Query.findById(queryId);

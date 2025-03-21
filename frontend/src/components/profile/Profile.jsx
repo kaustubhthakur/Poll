@@ -1,41 +1,39 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import './Profile.css';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
+import "./Profile.css";
 
 const Profile = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const { id } = useParams();
   const navigate = useNavigate();
-  
+
   const [isCurrentUser, setIsCurrentUser] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-      
-        const loggedInUser = JSON.parse(localStorage.getItem('user'));
-        
+        const loggedInUser = JSON.parse(localStorage.getItem("user"));
+
         if (!loggedInUser) {
-          navigate('/loginpage');
+          navigate("/loginpage");
           return;
         }
-        
-      
+
         const userId = id || loggedInUser._id;
-        
-        
+
         setIsCurrentUser(loggedInUser._id === userId);
-        
-   
-        const response = await axios.get(`http://localhost:9000/users/${userId}`);
+
+        const response = await axios.get(
+          `http://localhost:9000/users/${userId}`
+        );
         setUser(response.data);
         setLoading(false);
       } catch (err) {
-        console.error('Error fetching user:', err);
-        setError('Failed to load user profile');
+        console.error("Error fetching user:", err);
+        setError("Failed to load user profile");
         setLoading(false);
       }
     };
@@ -57,7 +55,7 @@ const Profile = () => {
       <div className="profile-container error">
         <h2>Error</h2>
         <p>{error}</p>
-        <button onClick={() => navigate('/')}>Go Home</button>
+        <button onClick={() => navigate("/")}>Go Home</button>
       </div>
     );
   }
@@ -67,7 +65,7 @@ const Profile = () => {
       <div className="profile-container error">
         <h2>User Not Found</h2>
         <p>The user profile you're looking for doesn't exist.</p>
-        <button onClick={() => navigate('/')}>Go Home</button>
+        <button onClick={() => navigate("/")}>Go Home</button>
       </div>
     );
   }
@@ -76,12 +74,14 @@ const Profile = () => {
     <div className="profile-container">
       <div className="profile-header">
         <div className="profile-avatar">
-          {user.username ? user.username.charAt(0).toUpperCase() : '?'}
+          {user.username ? user.username.charAt(0).toUpperCase() : "?"}
         </div>
         <div className="profile-info">
           <h1>{user.username}</h1>
           <p className="profile-email">{user.email}</p>
-          <p className="profile-date">Member since: {new Date(user.createdAt).toLocaleDateString()}</p>
+          <p className="profile-date">
+            Member since: {new Date(user.createdAt).toLocaleDateString()}
+          </p>
         </div>
       </div>
 
