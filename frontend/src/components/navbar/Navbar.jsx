@@ -9,7 +9,7 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user is logged in on component mount
+    
     const loggedInUser = localStorage.getItem('user');
     if (loggedInUser) {
       setUser(JSON.parse(loggedInUser));
@@ -22,14 +22,14 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      // Call logout endpoint
+   
       await axios.post('http://localhost:9000/auth/logout');
       
-      // Clear user data from localStorage
+     
       localStorage.removeItem('user');
       setUser(null);
       
-      // Redirect to home page
+     
       navigate('/');
     } catch (error) {
       console.error('Logout failed:', error);

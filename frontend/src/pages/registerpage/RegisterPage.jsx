@@ -35,7 +35,7 @@ const RegisterPage = () => {
       return false;
     }
 
-    // Password validation
+   
     if (password.length < 6) {
       setError('Password must be at least 6 characters long');
       return false;
@@ -69,7 +69,7 @@ const RegisterPage = () => {
      
       setTimeout(() => {
         navigate('/'); 
-      }, 1500);
+      }, 1000);
       
     } catch (error) {
       setLoading(false);
