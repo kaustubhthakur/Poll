@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './CreatePoll.css';
 
@@ -10,6 +10,38 @@ const CreatePoll = ({ onPollCreated }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [createdPolls, setCreatedPolls] = useState([]); // Ensure it's initialized as an array
+  const [votingInProgress, setVotingInProgress] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState('');
+
+  // Get current user ID on component mount
+  useEffect(() => {
+    const userId = localStorage.getItem('userId') || 'defaultUserId';
+    setCurrentUserId(userId);
+    
+    // Fetch existing polls
+    fetchPolls();
+  }, []);
+
+  const fetchPolls = async () => {
+    try {
+      const response = await axios.get('/api/polls');
+      // Check if response.data is an array, if not handle it appropriately
+      if (Array.isArray(response.data)) {
+        setCreatedPolls(response.data);
+      } else if (response.data && Array.isArray(response.data.polls)) {
+        // Some APIs might nest the array under a property name
+        setCreatedPolls(response.data.polls);
+      } else {
+        // Fallback to empty array if unexpected format
+        console.error('Unexpected data format from API:', response.data);
+        setCreatedPolls([]);
+      }
+    } catch (err) {
+      console.error('Error fetching polls:', err);
+      setCreatedPolls([]); // Reset to empty array on error
+    }
+  };
 
   // Handle adding a new query option
   const handleAddQuery = () => {
@@ -73,13 +105,10 @@ const CreatePoll = ({ onPollCreated }) => {
     setError('');
     
     try {
-      // Assuming you have user authentication implemented
-      const userId = localStorage.getItem('userId') || 'defaultUserId'; 
-      
       // First create the poll
       const pollResponse = await axios.post('/api/polls', {
         title,
-        userId
+        userId: currentUserId
       });
       
       const pollId = pollResponse.data._id;
@@ -104,6 +133,9 @@ const CreatePoll = ({ onPollCreated }) => {
       setTitle('');
       setPollQueries([{ description: '', image: null, imagePreview: '' }]);
       
+      // Fetch updated polls
+      fetchPolls();
+      
       // Reset success message after 3 seconds
       setTimeout(() => {
         setSuccess(false);
@@ -119,6 +151,31 @@ const CreatePoll = ({ onPollCreated }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Handle voting for a query
+  const handleVote = async (queryId) => {
+    if (!currentUserId || votingInProgress) {
+      return;
+    }
+
+    setVotingInProgress(true);
+    try {
+      await axios.post(`/api/queries/${queryId}/vote`, { userId: currentUserId });
+      
+      // Refresh polls to get updated vote counts
+      fetchPolls();
+      
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to register vote. Please try again.');
+    } finally {
+      setVotingInProgress(false);
+    }
+  };
+
+  // Check if user has already voted for a query
+  const hasVoted = (query) => {
+    return query.vote && Array.isArray(query.vote) && query.vote.includes(currentUserId);
   };
 
   return (
@@ -215,6 +272,43 @@ const CreatePoll = ({ onPollCreated }) => {
           {loading ? 'Creating Poll...' : 'Create Complete Poll'}
         </button>
       </form>
+
+      {/* Display existing polls with voting capability */}
+      {Array.isArray(createdPolls) && createdPolls.length > 0 ? (
+        <div className="existing-polls">
+          <h2>Existing Polls</h2>
+          
+          {createdPolls.map(poll => (
+            <div key={poll._id} className="poll-item">
+              <h3>{poll.title}</h3>
+              <div className="poll-options">
+                {Array.isArray(poll.queries) && poll.queries.map(query => (
+                  <div key={query._id} className="query-option">
+                    <div className="query-option-content">
+                      <div className="query-option-image">
+                        <img src={query.image} alt={query.description} />
+                      </div>
+                      <div className="query-option-details">
+                        <h4>{query.description}</h4>
+                        <p className="vote-count">
+                          {Array.isArray(query.vote) ? query.vote.length : 0} votes
+                        </p>
+                      </div>
+                    </div>
+                    <button 
+                      className={`vote-btn ${hasVoted(query) ? 'voted' : ''}`}
+                      onClick={() => handleVote(query._id)}
+                      disabled={votingInProgress || hasVoted(query)}
+                    >
+                      {hasVoted(query) ? 'Voted' : 'Vote'}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 };

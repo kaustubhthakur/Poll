@@ -2,13 +2,31 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './CreateQuery.css';
 
-const CreateQuery = ({ pollId, onQueryAdded }) => {
+const CreateQuery = ({ pollId, onQueryAdded, currentUserId }) => {
   const [description, setDescription] = useState('');
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [queries, setQueries] = useState([]);
+  const [votingInProgress, setVotingInProgress] = useState(false);
+
+  // Fetch existing queries for this poll
+  useEffect(() => {
+    if (pollId) {
+      fetchQueries();
+    }
+  }, [pollId]);
+
+  const fetchQueries = async () => {
+    try {
+      const response = await axios.get(`/api/polls/${pollId}/queries`);
+      setQueries(response.data);
+    } catch (err) {
+      console.error('Error fetching queries:', err);
+    }
+  };
 
   // Handle image file selection
   const handleImageChange = (e) => {
@@ -67,6 +85,9 @@ const CreateQuery = ({ pollId, onQueryAdded }) => {
       setSuccess(true);
       resetForm();
       
+      // Add the new query to the list
+      setQueries([...queries, response.data]);
+      
       // Notify parent component of the new query
       if (onQueryAdded && response.data) {
         onQueryAdded(response.data);
@@ -82,6 +103,33 @@ const CreateQuery = ({ pollId, onQueryAdded }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Handle voting
+  const handleVote = async (queryId) => {
+    if (!currentUserId || votingInProgress) {
+      return;
+    }
+
+    setVotingInProgress(true);
+    try {
+      const response = await axios.post(`/api/queries/${queryId}/vote`, { userId: currentUserId });
+      
+      // Update the queries state with the updated vote data
+      setQueries(queries.map(query => 
+        query._id === queryId ? response.data : query
+      ));
+      
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to register vote. Please try again.');
+    } finally {
+      setVotingInProgress(false);
+    }
+  };
+
+  // Check if user has already voted for a query
+  const hasVoted = (query) => {
+    return query.vote && query.vote.includes(currentUserId);
   };
 
   return (
@@ -135,6 +183,35 @@ const CreateQuery = ({ pollId, onQueryAdded }) => {
           {loading ? 'Adding...' : 'Add Option'}
         </button>
       </form>
+
+      {/* Display existing queries with voting options */}
+      {queries.length > 0 && (
+        <div className="queries-list">
+          <h4>Current Poll Options</h4>
+          <div className="query-items">
+            {queries.map(query => (
+              <div key={query._id} className="query-item">
+                <div className="query-content">
+                  <div className="query-image">
+                    <img src={query.image} alt={query.description} />
+                  </div>
+                  <div className="query-details">
+                    <h5>{query.description}</h5>
+                    <p>{query.vote ? query.vote.length : 0} votes</p>
+                  </div>
+                </div>
+                <button 
+                  className={`vote-btn ${hasVoted(query) ? 'voted' : ''}`}
+                  onClick={() => handleVote(query._id)}
+                  disabled={votingInProgress || hasVoted(query)}
+                >
+                  {hasVoted(query) ? 'Voted' : 'Vote'}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
