@@ -58,8 +58,9 @@ const Navbar = () => {
             <>
               <Link to="/profile" className="profile-button">Profile</Link>
               <p className="profile-button"> {user.username}</p>
+              
               <button onClick={handleLogout} className="logout-button">Logout</button>
-              <Link to="/polls" >poll</Link>
+              <Link to="/createpoll" >poll</Link>
             </>
           ) : (
             <>
