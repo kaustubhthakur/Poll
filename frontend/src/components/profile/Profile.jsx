@@ -71,7 +71,6 @@ const Profile = () => {
       </div>
     );
   }
-
   return (
     <div className="profile-container">
       <div className="profile-header">
